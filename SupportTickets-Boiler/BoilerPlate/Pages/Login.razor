@@ -1,0 +1,21 @@
+﻿@page "/login"
+@using BoilerPlate.Services
+@inject UserService Users
+@inject NavigationManager Nav
+
+<h3>Log In</h3>
+<input @bind="username" placeholder="Username" />
+<input type="password" @bind="password" placeholder="Password" />
+<button class="btn btn-primary" @onclick="DoLogin">Log In</button>
+
+@code {
+    string username, password;
+    void DoLogin()
+    {
+        var u = Users.Authenticate(username, password);
+        if (u != null)
+            Nav.NavigateTo(u.IsCompany ? "/company" : $"/dashboard/{username}");
+        else
+            /* show “bad creds” error */;
+    }
+}

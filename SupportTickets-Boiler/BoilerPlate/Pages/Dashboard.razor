@@ -1,0 +1,20 @@
+﻿@page "/dashboard/{User}"
+@using BoilerPlate.Models
+@using BoilerPlate.Services
+@inject TicketService Tickets
+
+<h3>@User’s Tickets</h3>
+@foreach(var t in Tickets.GetByUser(User))
+{
+    <div class="card my-2 p-2">
+        <p>@t.Content</p>
+        <span class="badge @(Badge(t.Status))">@t.Status</span>
+    </div>
+}
+
+@code {
+    [Parameter] public string User { get; set; } = "";
+    string Badge(TicketStatus s) =>
+        s == TicketStatus.InProgress ? "bg-warning"
+        : s == TicketStatus.Resolved   ? "bg-success" : "bg-secondary";
+}

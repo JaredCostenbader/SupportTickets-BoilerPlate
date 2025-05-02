@@ -1,0 +1,26 @@
+﻿@page "/company"
+@using BoilerPlate.Models
+@using BoilerPlate.Services
+@inject TicketService Tickets
+
+<h3>Company Dashboard</h3>
+@foreach(var t in Tickets.GetAll())
+{
+    <div class="d-flex justify-content-between align-items-center card my-2 p-2">
+        <div><strong>@t.Username:</strong> @t.Content</div>
+        <div>
+            <span class="badge @(Badge(t.Status))">@t.Status</span>
+            <button class="btn btn-sm btn-outline-warning mx-1"
+                    @onclick="() => Change(t.Id, TicketStatus.InProgress)">Handle</button>
+            <button class="btn btn-sm btn-outline-success"
+                    @onclick="() => Change(t.Id, TicketStatus.Resolved)">Resolve</button>
+        </div>
+    </div>
+}
+
+@code {
+    string Badge(TicketStatus s) =>
+        s == TicketStatus.InProgress ? "bg-warning"
+        : s == TicketStatus.Resolved   ? "bg-success" : "bg-secondary";
+    void Change(int id, TicketStatus s) => Tickets.UpdateStatus(id, s);
+}

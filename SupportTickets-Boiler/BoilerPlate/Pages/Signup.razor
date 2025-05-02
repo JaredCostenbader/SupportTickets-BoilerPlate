@@ -1,0 +1,22 @@
+﻿@page "/signup"
+@using BoilerPlate.Services
+@inject UserService Users
+@inject NavigationManager Nav
+
+<h3>Sign Up</h3>
+<input @bind="username" placeholder="Username" />
+<input type="password" @bind="password" placeholder="Password" />
+<label><input type="checkbox" @bind="isCompany" /> Company account</label>
+<button class="btn btn-primary" @onclick="DoSignup">Sign Up</button>
+
+@code {
+    string username, password;
+    bool   isCompany;
+    void DoSignup()
+    {
+        if (Users.Register(new() { Username=username, Password=password, IsCompany=isCompany }))
+            Nav.NavigateTo("/login");
+        else
+            /* show “already taken” error */;
+    }
+}

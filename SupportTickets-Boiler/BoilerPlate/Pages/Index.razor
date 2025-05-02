@@ -1,9 +1,18 @@
 ﻿@page "/"
+@using BoilerPlate.Services
+@inject TicketService Tickets
+@inject NavigationManager Nav
 
-<PageTitle>Index</PageTitle>
+<h3>Submit a Ticket</h3>
+<input @bind="content" placeholder="Describe your issue..." class="form-control mb-2" />
+<button class="btn btn-success" @onclick="Submit">Submit</button>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    string content;
+    void Submit()
+    {
+        // TODO: replace "demoUser" with real auth
+        Tickets.Submit("demoUser", content);
+        Nav.NavigateTo("/dashboard/demoUser");
+    }
+}
