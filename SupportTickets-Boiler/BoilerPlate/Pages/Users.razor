@@ -1,8 +1,8 @@
 ﻿@page "/users"
 @using BoilerPlate.Models
 @using BoilerPlate.Services
-@inject UserService Users
-@inject TicketService Tickets
+@inject UserService   userService
+@inject TicketService ticketService
 @inject NavigationManager Nav
 
 <div class="container py-5">
@@ -19,9 +19,9 @@
         </tr>
         </thead>
         <tbody>
-        @foreach(var u in Users.GetAll())
+        @foreach(var u in userService.GetAll())
         {
-            var list = Tickets.GetByUser(u.Username).ToList();
+            var list = ticketService.GetByUser(u.Username).ToList();
             <tr>
                 <td>@u.Username</td>
                 <td>@list.Count(t => t.Status == TicketStatus.Draft)</td>
@@ -35,7 +35,7 @@
 
     <div class="text-center mt-4">
         <button class="btn btn-primary btn-lg"
-                @onclick="() => Nav.NavigateTo("/company")">
+                @onclick='() => Nav.NavigateTo("/company")'>
             View All Tickets →
         </button>
     </div>
