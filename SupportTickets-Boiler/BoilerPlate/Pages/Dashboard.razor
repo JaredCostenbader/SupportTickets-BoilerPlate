@@ -1,20 +1,34 @@
-﻿@page "/dashboard/{User}"
+﻿@page "/dashboard"
 @using BoilerPlate.Models
 @using BoilerPlate.Services
 @inject TicketService Tickets
+@inject SessionService Session
+@inject NavigationManager Nav
 
-<h3>@User’s Tickets</h3>
-@foreach(var t in Tickets.GetByUser(User))
-{
-    <div class="card my-2 p-2">
-        <p>@t.Content</p>
-        <span class="badge @(Badge(t.Status))">@t.Status</span>
+<div class="container py-5">
+    <h3 class="text-center mb-4">Your Tickets</h3>
+
+    @foreach(var t in Tickets.GetByUser(Session.CurrentUsername!))
+    {
+        <div class="card mb-2 p-3">
+            <div><strong>Link:</strong> @t.LinkId</div>
+            <div class="mt-1">@t.Content</div>
+            <div class="mt-2">
+                <span class="badge @(Badge(t.Status))">@t.Status</span>
+            </div>
+        </div>
+    }
+
+    <div class="text-center mt-4">
+        <button class="btn btn-success btn-lg"
+                @onclick="() => Nav.NavigateTo("/submit")">
+            Submit Another Ticket
+        </button>
     </div>
-}
+</div>
 
 @code {
-    [Parameter] public string User { get; set; } = "";
     string Badge(TicketStatus s) =>
-        s == TicketStatus.InProgress ? "bg-warning"
-        : s == TicketStatus.Resolved   ? "bg-success" : "bg-secondary";
+        s == TicketStatus.InProgress ? "bg-warning" :
+        s == TicketStatus.Resolved   ? "bg-success" : "bg-secondary";
 }
