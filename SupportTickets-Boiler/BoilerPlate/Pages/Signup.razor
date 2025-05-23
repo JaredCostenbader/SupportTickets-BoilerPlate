@@ -1,0 +1,56 @@
+﻿@page "/signup"
+@using BoilerPlate.Services
+@inject UserService Users
+@inject NavigationManager Nav
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4" style="min-width: 320px;">
+        <h3 class="text-center mb-3">Sign Up</h3>
+
+        <input class="form-control form-control-lg mb-2"
+               @bind="username"
+               placeholder="Username" />
+
+        <input type="password"
+               class="form-control form-control-lg mb-3"
+               @bind="password"
+               placeholder="Password" />
+
+        <div class="form-check mb-3">
+            <input class="form-check-input"
+                   type="checkbox"
+                   id="companyCheck"
+                   @bind="isCompany" />
+            <label class="form-check-label" for="companyCheck">
+                Company Account
+            </label>
+        </div>
+
+        <button class="btn btn-success btn-lg w-100 mb-2"
+                @onclick="DoSignup">
+            Sign Up
+        </button>
+
+        <div class="text-center">
+            <a href="/">Already have an account? Log in</a>
+        </div>
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="text-danger text-center mt-2">@error</div>
+        }
+    </div>
+</div>
+
+@code {
+    string username, password, error;
+    bool isCompany;
+
+    void DoSignup()
+    {
+        if (Users.Register(new() { Username=username, Password=password, IsCompany=isCompany }))
+            Nav.NavigateTo("/");
+        else
+            error = "Username already taken";
+    }
+}

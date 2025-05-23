@@ -1,0 +1,62 @@
+﻿@page "/"
+@using BoilerPlate.Services
+@inject UserService Users
+@inject SessionService Session
+@inject NavigationManager Nav
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4" style="min-width: 320px;">
+        <h3 class="text-center mb-3">Log In</h3>
+
+        <input class="form-control form-control-lg mb-2"
+               @bind="username"
+               placeholder="Username" />
+
+        <input type="password"
+               class="form-control form-control-lg mb-3"
+               @bind="password"
+               placeholder="Password" />
+
+        <div class="form-check mb-3">
+            <input class="form-check-input"
+                   type="checkbox"
+                   id="companyCheck"
+                   @bind="isCompanyLogin" />
+            <label class="form-check-label" for="companyCheck">
+                Company Account
+            </label>
+        </div>
+
+        <button class="btn btn-primary btn-lg w-100 mb-2"
+                @onclick="DoLogin">
+            Log In
+        </button>
+
+        <div class="text-center">
+            <a href="/signup">Don’t have an account? Sign up</a>
+        </div>
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="text-danger text-center mt-2">@error</div>
+        }
+    </div>
+</div>
+
+@code {
+    string username, password, error;
+    bool isCompanyLogin;
+
+    void DoLogin()
+    {
+        var u = Users.Authenticate(username, password);
+        if (u == null) { error = "Bad credentials"; return; }
+        if (u.IsCompany != isCompanyLogin) { error = "Account type mismatch"; return; }
+
+        Session.CurrentUsername = username;
+        if (u.IsCompany)
+            Nav.NavigateTo("/users");          // company starts at Users page
+        else
+            Nav.NavigateTo("/submit");         // regular users go to Submit
+    }
+}

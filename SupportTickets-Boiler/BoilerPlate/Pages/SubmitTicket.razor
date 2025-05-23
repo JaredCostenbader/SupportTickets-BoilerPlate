@@ -1,0 +1,46 @@
+﻿@page "/submit"
+@using BoilerPlate.Services
+@inject TicketService Tickets
+@inject SessionService Session
+@inject NavigationManager Nav
+
+<div class="container py-5">
+    <h3 class="text-center mb-4">Submit a Ticket</h3>
+
+    <textarea class="form-control mb-3"
+            @bind="content"
+            rows="4"
+            placeholder="Describe your issue...">
+  </textarea>
+
+    <div class="d-grid gap-2">
+        <button class="btn btn-outline-secondary btn-lg"
+                @onclick="SaveDraft">
+            Save Draft
+        </button>
+        <button class="btn btn-primary btn-lg"
+                @onclick="Submit">
+            Submit
+        </button>
+        <button class="btn btn-link btn-lg"
+                @onclick='() => Nav.NavigateTo("/dashboard")'>
+            View Your Tickets →
+        </button>
+
+
+    </div>
+</div>
+
+@code {
+    string content = "";
+    void SaveDraft()
+    {
+        Tickets.SaveDraft(Session.CurrentUsername!, content);
+        Nav.NavigateTo("/dashboard");
+    }
+    void Submit()
+    {
+        Tickets.Submit(Session.CurrentUsername!, content);
+        Nav.NavigateTo("/dashboard");
+    }
+}
