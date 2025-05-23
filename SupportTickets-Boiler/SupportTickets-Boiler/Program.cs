@@ -1,12 +1,18 @@
-using Microsoft.FluentUI.AspNetCore.Components;
+
+using Radzen;
 using SupportTickets_Boiler.Components;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddRadzenCookieThemeService(options =>
+{
+    options.Name = "MyApplicationTheme"; // The name of the cookie
+    options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
+});
 // Add services to the container.
+builder.Services.AddRadzenComponents();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-builder.Services.AddFluentUIComponents();
+
 
 var app = builder.Build();
 
