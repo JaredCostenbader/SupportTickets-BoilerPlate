@@ -1,23 +1,20 @@
 ﻿@inherits LayoutComponentBase
 
-<main class="container">
+@using BoilerPlate.Services
+
+@inject SessionService Session
+
+<main class="container py-4 position-relative">
     @Body
-</main>
 
-<PageTitle>BoilerPlate</PageTitle>
-
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+    @* Profile picture and username only *@
+    @if (!string.IsNullOrEmpty(Session.CurrentUsername))
+    {
+        <div style="position:absolute; top:1rem; right:1rem; text-align:center;">
+            <img src="images/@(Session.IsCompany ? "company-pfp.png" : "user-pfp.png")"
+                 alt="Profile"
+                 style="width:48px; height:48px; border-radius:50%; margin-bottom:0.5rem;" />
+            <div>@Session.CurrentUsername</div>
         </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+    }
+</main>
