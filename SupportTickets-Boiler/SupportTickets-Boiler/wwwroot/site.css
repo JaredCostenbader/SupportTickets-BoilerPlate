@@ -1,0 +1,31 @@
+﻿body {
+    background-color: #121212;
+    color: white;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.nav-bar {
+    background-color: #1f1f1f;
+    padding: 1rem;
+}
+
+    .nav-bar a {
+        color: white;
+        text-decoration: none;
+        margin: 0 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: 0.2s ease;
+    }
+
+        .nav-bar a:hover,
+        .nav-bar a.active {
+            background-color: #333;
+        }
+
+.main-content {
+    padding: 2rem;
+}
