@@ -1,10 +1,17 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="nav-bar">
-    <NavLink href="/" Match="NavLinkMatch.All">Home</NavLink>
-    <NavLink href="/features">Features</NavLink>
-    <NavLink href="/pricing">Pricing</NavLink>
-    <NavLink href="/checkout">Checkout</NavLink>
+    <a href="/" class="logo-raja">Raja</a>
+    <div class="nav-links-group">
+        <NavLink href="/" Match="NavLinkMatch.All">Home</NavLink>
+        <NavLink href="/features">Features</NavLink>
+        <NavLink href="/pricing">Pricing</NavLink>
+        <NavLink href="/checkout">Checkout</NavLink>
+        @* Discord Icon Link - placed last in the group to be on the far right *@
+        <a href="https://discord.gg/sPEwYgwjtZ" target="_blank" rel="noopener noreferrer" class="discord-link">
+            <span class="oi oi-external-link" aria-hidden="true"></span> Discord
+        </a>
+    </div>
 </div>
 
 <div class="main-content">
