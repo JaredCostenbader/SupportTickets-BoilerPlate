@@ -28,8 +28,8 @@ namespace BoilerPlate.Services
             return t;
         }
 
-        public IEnumerable<Ticket> GetByUser(string user) =>
-            _tickets.Where(t => t.Username == user);
+        public IEnumerable<Ticket> GetByUser(string user)
+            => _tickets.Where(t => t.Username == user);
 
         public IEnumerable<Ticket> GetAll() => _tickets;
 
@@ -37,6 +37,26 @@ namespace BoilerPlate.Services
         {
             var t = _tickets.FirstOrDefault(x => x.Id == id);
             if (t != null) t.Status = s;
+        }
+
+        public void AssignHandler(int id, string handler)
+        {
+            var t = _tickets.FirstOrDefault(x => x.Id == id);
+            if (t != null)
+            {
+                t.Handler = handler;
+                t.Status = TicketStatus.InProgress;
+            }
+        }
+
+        public void UnassignHandler(int id)
+        {
+            var t = _tickets.FirstOrDefault(x => x.Id == id);
+            if (t != null)
+            {
+                t.Handler = null;
+                t.Status = TicketStatus.Submitted;
+            }
         }
     }
 }

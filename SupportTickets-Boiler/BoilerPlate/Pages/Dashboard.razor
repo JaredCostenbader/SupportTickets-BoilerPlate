@@ -1,21 +1,38 @@
 ﻿@page "/dashboard"
 @using BoilerPlate.Models
 @using BoilerPlate.Services
-@inject TicketService Tickets
-@inject SessionService Session
+@inject TicketService   Tickets
+@inject SessionService  Session
 @inject NavigationManager Nav
 
 <div class="container py-5">
     <h3 class="text-center mb-4">Your Tickets</h3>
 
-    @foreach(var t in Tickets.GetByUser(Session.CurrentUsername!))
+    @foreach (var t in Tickets.GetByUser(Session.CurrentUsername!))
     {
         <div class="card mb-2 p-3">
             <div><strong>Link:</strong> @t.LinkId</div>
             <div class="mt-1">@t.Content</div>
+
             <div class="mt-2">
-                <span class="badge @(Badge(t.Status))">@t.Status</span>
+                <span class="badge 
+                     @(t.Status == TicketStatus.Submitted   ? "bg-secondary" :
+                     t.Status == TicketStatus.InProgress   ? "bg-warning"  :
+                     /* resolved */                       "bg-success")">
+                    @(t.Status == TicketStatus.Submitted   ? "Submitted" :
+                    t.Status == TicketStatus.InProgress   ? "In Progress" :
+                    "Resolved")
+                </span>
             </div>
+
+            @if (t.Status == TicketStatus.InProgress)
+            {
+                <div class="mt-1"><em>Being handled by: @t.Handler</em></div>
+            }
+            else if (t.Status == TicketStatus.Resolved)
+            {
+                <div class="mt-1 text-success"><em>Resolved by: @t.Handler</em></div>
+            }
         </div>
     }
 
@@ -26,9 +43,3 @@
         </button>
     </div>
 </div>
-
-@code {
-    string Badge(TicketStatus s) =>
-        s == TicketStatus.InProgress ? "bg-warning" :
-        s == TicketStatus.Resolved   ? "bg-success" : "bg-secondary";
-}

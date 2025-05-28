@@ -2,45 +2,83 @@
 @using BoilerPlate.Models
 @using BoilerPlate.Services
 @inject TicketService Tickets
+@inject SessionService Session
+@inject UserService Users
 @inject NavigationManager Nav
 
 <div class="container py-5">
-    <h3 class="text-center mb-4">All Submitted Tickets</h3>
+    <div class="row">
+        <!-- Sidebar of employees -->
+        <div class="col-md-3">
+            <h5>Employees</h5>
+            <ul class="list-group mb-4">
+                @foreach (var emp in Users.GetAll().Where(u => u.IsCompany))
+                {
+                    var inProg = Tickets.GetAll()
+                    .Count(t => t.Handler == emp.Username &&
+                    t.Status == TicketStatus.InProgress);
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-secondary text-white">
+                        @emp.Username
+                        <span class="badge bg-warning rounded-pill">@inProg</span>
+                    </li>
+                }
+            </ul>
+        </div>
 
-    @foreach(var t in Tickets.GetAll())
-    {
-        <div class="card mb-2 p-3 d-flex justify-content-between align-items-center">
-            <div>
-                <strong>@t.Username</strong> &mdash;
-                <span><strong>Link:</strong> @t.LinkId</span>
-                <div class="mt-1">@t.Content</div>
-            </div>
-            <div class="btn-group">
-                <span class="badge @(Badge(t.Status)) me-2">@t.Status</span>
-                <button class="btn btn-sm btn-outline-warning"
-                        @onclick="() => Change(t.Id, TicketStatus.InProgress)">
-                    Handle
-                </button>
-                <button class="btn btn-sm btn-outline-success"
-                        @onclick="() => Change(t.Id, TicketStatus.Resolved)">
-                    Resolve
+        <!-- All Tickets -->
+        <div class="col-md-9">
+            <h3 class="mb-4">All Tickets</h3>
+
+            @foreach (var t in Tickets.GetAll().Where(t => t.Status != TicketStatus.Draft))
+            {
+                <div class="card mb-2 p-3 d-flex justify-content-between align-items-start">
+                    <div style="flex:1;">
+                        <strong>@t.Username</strong> — Link: @t.LinkId
+                        <div class="mt-1">@t.Content</div>
+
+                        @if (t.Status == TicketStatus.Submitted)
+                        {
+                            <small class="text-muted">Status: Submitted</small>
+                        }
+                        else if (t.Status == TicketStatus.InProgress)
+                        {
+                            <small class="text-muted">In Progress by: @t.Handler</small>
+                        }
+                        else if (t.Status == TicketStatus.Resolved)
+                        {
+                            <small class="text-success">Resolved by: @t.Handler</small>
+                        }
+                    </div>
+
+                    <div class="d-flex flex-column gap-1 ms-3">
+                        @* Handler controls *@
+                        @if (t.Handler == Session.CurrentUsername && t.Status == TicketStatus.InProgress)
+                        {
+                            <button class="btn btn-sm btn-outline-danger"
+                                    @onclick='() => Tickets.UnassignHandler(t.Id)'>
+                                Unhandle
+                            </button>
+                            <button class="btn btn-sm btn-outline-success"
+                                    @onclick='() => Tickets.UpdateStatus(t.Id, TicketStatus.Resolved)'>
+                                Resolve
+                            </button>
+                        }
+                        else if (t.Handler is null && t.Status == TicketStatus.Submitted)
+                        {
+                            <button class="btn btn-sm btn-outline-warning"
+                                    @onclick='() => Tickets.AssignHandler(t.Id, Session.CurrentUsername!)'>
+                                Handle
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="text-end mt-3">
+                <button class="btn btn-link" @onclick='() => Nav.NavigateTo("/users")'>
+                    ← Back to Users
                 </button>
             </div>
         </div>
-    }
-
-    <div class="text-center mt-4">
-        <button class="btn btn-link btn-lg"
-                @onclick='() => Nav.NavigateTo("/users")'>
-            ← Back to Users
-        </button>
     </div>
 </div>
-
-@code {
-    string Badge(TicketStatus s) =>
-        s == TicketStatus.InProgress ? "bg-warning" :
-        s == TicketStatus.Resolved   ? "bg-success" : "bg-secondary";
-
-    void Change(int id, TicketStatus s) => Tickets.UpdateStatus(id, s);
-}

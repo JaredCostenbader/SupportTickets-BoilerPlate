@@ -1,38 +1,64 @@
 ﻿@page "/users"
-@using BoilerPlate.Services
 @using BoilerPlate.Models
-@inject UserService   userService
+@using BoilerPlate.Services
+@inject UserService userService
 @inject TicketService ticketService
 @inject NavigationManager Nav
 
-<div class="container py-5">
-    <h3 class="text-center mb-4">Registered Users &amp; Ticket Counts</h3>
+<div class="container-fluid py-5 bg-dark text-light" style="min-height:80vh;">
+    <div class="row">
+        <!-- Sidebar: company accounts -->
+        <aside class="col-md-3 mb-4">
+            <h5>Companies</h5>
+            <ul class="list-group">
+                @foreach (var comp in userService.GetAll().Where(u => u.IsCompany))
+                {
+                    var cnt = ticketService.GetAll()
+                    .Count(t => t.Handler == comp.Username);
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-secondary text-white">
+                        @comp.Username
+                        <span class="badge bg-primary rounded-pill">@cnt</span>
+                    </li>
+                }
+            </ul>
+        </aside>
 
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>User</th><th>Drafts</th><th>Submitted</th><th>In Progress</th><th>Resolved</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach(var u in userService.GetAll().Where(u => !u.IsCompany))
-        {
-            var list = ticketService.GetByUser(u.Username).ToList();
-            <tr>
-                <td>@u.Username</td>
-                <td>@list.Count(t => t.Status == TicketStatus.Draft)</td>
-                <td>@list.Count(t => t.Status == TicketStatus.Submitted)</td>
-                <td>@list.Count(t => t.Status == TicketStatus.InProgress)</td>
-                <td>@list.Count(t => t.Status == TicketStatus.Resolved)</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+        <!-- Main: users table + button -->
+        <section class="col-md-9">
+            <h3 class="mb-4">Registered Users &amp; Ticket Counts</h3>
+            <div class="table-responsive mb-3">
+                <table class="table table-dark table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Drafts</th>
+                            <th>Submitted</th>
+                            <th>In Progress</th>
+                            <th>Resolved</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var u in userService.GetAll().Where(u => !u.IsCompany))
+                        {
+                            var list = ticketService.GetByUser(u.Username).ToList();
+                            <tr>
+                                <td>@u.Username</td>
+                                <td>@list.Count(t => t.Status == TicketStatus.Draft)</td>
+                                <td>@list.Count(t => t.Status == TicketStatus.Submitted)</td>
+                                <td>@list.Count(t => t.Status == TicketStatus.InProgress)</td>
+                                <td>@list.Count(t => t.Status == TicketStatus.Resolved)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
-    <div class="text-center mt-4">
-        <button class="btn btn-primary btn-lg"
-                @onclick='() => Nav.NavigateTo("/company")'>
-            View All Tickets →
-        </button>
+            <div class="text-end">
+                <button class="btn btn-outline-light btn-lg"
+                        @onclick='() => Nav.NavigateTo("/company")'>
+                    View All Tickets →
+                </button>
+            </div>
+        </section>
     </div>
 </div>
