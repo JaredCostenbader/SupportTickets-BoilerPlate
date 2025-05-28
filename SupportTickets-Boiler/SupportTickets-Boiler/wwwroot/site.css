@@ -4,27 +4,65 @@
     font-family: sans-serif;
     margin: 0;
     padding: 0;
-    text-align: center;
+    /* Removed text-align: center from body, as nav-bar's flexbox will control horizontal alignment */
 }
 
 .nav-bar {
     background-color: #1f1f1f;
     padding: 1rem;
+    display: flex; /* Enable flexbox for horizontal alignment */
+    justify-content: space-between; /* Pushes the first item (logo) to the left and the last item (link group) to the right */
+    align-items: center; /* Vertically centers all items in the nav-bar */
 }
 
+    /* This rule applies base button-like styles to all <a> tags within .nav-bar, including the logo and NavLinks */
     .nav-bar a {
         color: white;
         text-decoration: none;
-        margin: 0 1rem;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        transition: 0.2s ease;
+        padding: 0.5rem 1rem; /* Keep original button padding */
+        border-radius: 6px; /* Keep original button border-radius */
+        transition: 0.2s ease; /* Keep original transition */
+        /* Remove default margins from here, as spacing will be handled by flexbox 'gap' or specific margins */
+        margin: 0;
     }
 
+        /* Apply original hover/active background color to all items that should behave like buttons */
         .nav-bar a:hover,
         .nav-bar a.active {
             background-color: #333;
         }
+
+/* Specific styling for the Raja logo element */
+.logo-raja {
+    font-size: 1.5em; /* Make the logo text stand out */
+    font-weight: bold;
+    margin-right: auto; /* This is crucial: it pushes the subsequent flex items (.nav-links-group) to the far right */
+    margin-left: 0; /* Ensures the logo is flush with the left padding of .nav-bar */
+    background-color: transparent !important; /* Keep logo background transparent, overriding general hover/active */
+}
+
+    /* Refine hover/active for logo text to only show underline */
+    .logo-raja:hover {
+        text-decoration: underline;
+        background-color: transparent !important;
+    }
+
+    .logo-raja.active {
+        background-color: transparent !important;
+    }
+
+/* New container for the grouped navigation links on the right */
+.nav-links-group {
+    display: flex; /* Make this group a flex container to arrange its children horizontally */
+    align-items: center; /* Vertically align items within this group */
+    gap: 4px; /* Adds a 4px space between each NavLink and the Discord link within this group */
+}
+
+/* Ensure the Discord link also gets the button-like hover/active style */
+.discord-link:hover,
+.discord-link.active {
+    background-color: #333; /* Inherits from .nav-bar a, but good to be explicit */
+}
 
 .main-content {
     padding: 2rem;
