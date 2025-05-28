@@ -1,22 +1,24 @@
 ﻿@page "/submit"
+@using Microsoft.AspNetCore.WebUtilities
+@using BoilerPlate.Models
 @using BoilerPlate.Services
 @inject TicketService Tickets
 @inject SessionService Session
 @inject NavigationManager Nav
 
-<div class="container py-5">
-    <h3 class="text-center mb-4">Submit a Ticket</h3>
+<main class="container py-5">
+    <h3 class="text-center mb-4">@((isEditing ? "Edit Draft" : "Submit a Ticket"))</h3>
 
     <textarea class="form-control mb-3"
-            @bind="content"
-            rows="4"
-            placeholder="Describe your issue...">
-  </textarea>
+              @bind="content"
+              @bind:event="oninput"
+              rows="4"
+              placeholder="Describe your issue..."></textarea>
 
     <div class="d-grid gap-2">
         <button class="btn btn-outline-secondary btn-lg"
                 @onclick="SaveDraft">
-            Save Draft
+            @(isEditing ? "Update Draft" : "Save Draft")
         </button>
         <button class="btn btn-primary btn-lg"
                 @onclick="Submit">
@@ -26,21 +28,55 @@
                 @onclick='() => Nav.NavigateTo("/dashboard")'>
             View Your Tickets →
         </button>
-
-
     </div>
-</div>
+</main>
 
 @code {
     string content = "";
+    bool isEditing = false;
+    int draftId = 0;
+
+    protected override void OnInitialized()
+    {
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query)
+            .TryGetValue("draftId", out var val)
+            && int.TryParse(val, out var id))
+        {
+            var draft = Tickets.GetByUser(Session.CurrentUsername!)
+                .FirstOrDefault(t => t.Id == id && t.Status == TicketStatus.Draft);
+            if (draft != null)
+            {
+                content = draft.Content;
+                isEditing = true;
+                draftId = id;
+            }
+        }
+    }
+
     void SaveDraft()
     {
-        Tickets.SaveDraft(Session.CurrentUsername!, content);
+        if (isEditing)
+        {
+            Tickets.UpdateStatus(draftId, TicketStatus.Draft);
+        }
+        else
+        {
+            Tickets.SaveDraft(Session.CurrentUsername!, content);
+        }
         Nav.NavigateTo("/dashboard");
     }
+
     void Submit()
     {
-        Tickets.Submit(Session.CurrentUsername!, content);
+        if (isEditing)
+        {
+            Tickets.UpdateStatus(draftId, TicketStatus.Submitted);
+        }
+        else
+        {
+            Tickets.Submit(Session.CurrentUsername!, content);
+        }
         Nav.NavigateTo("/dashboard");
     }
 }

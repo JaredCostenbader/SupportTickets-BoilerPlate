@@ -15,14 +15,24 @@
             <div class="mt-1">@t.Content</div>
 
             <div class="mt-2">
-                <span class="badge 
-                     @(t.Status == TicketStatus.Submitted   ? "bg-secondary" :
-                     t.Status == TicketStatus.InProgress   ? "bg-warning"  :
-                     /* resolved */                       "bg-success")">
-                    @(t.Status == TicketStatus.Submitted   ? "Submitted" :
-                    t.Status == TicketStatus.InProgress   ? "In Progress" :
-                    "Resolved")
-                </span>
+                @if (t.Status == TicketStatus.Draft)
+                {
+                    <button class="btn btn-secondary btn-sm"
+                            @onclick='() => Nav.NavigateTo($"/submit?draftId={t.Id}")'>
+                        Load Draft
+                    </button>
+                }
+                else
+                {
+                    <span class="badge 
+                       @(t.Status == TicketStatus.Submitted   ? "bg-secondary" :
+                       t.Status == TicketStatus.InProgress   ? "bg-warning"   :
+                       /* resolved */                        "bg-success")">
+                        @(t.Status == TicketStatus.Submitted   ? "Submitted" :
+                        t.Status == TicketStatus.InProgress   ? "In Progress" :
+                        "Resolved")
+                    </span>
+                }
             </div>
 
             @if (t.Status == TicketStatus.InProgress)

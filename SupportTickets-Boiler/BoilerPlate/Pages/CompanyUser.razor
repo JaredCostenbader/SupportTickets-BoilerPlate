@@ -1,20 +1,30 @@
-﻿@page "/company"
+﻿@page "/company/user/{Username}"
 @using BoilerPlate.Models
 @using BoilerPlate.Services
+@using Microsoft.AspNetCore.Components
 @inject TicketService Tickets
 @inject SessionService Session
 @inject UserService Users
 @inject NavigationManager Nav
 
-@{
-    // Same palette and ordering as Users.razor
-    var companies = Users.GetAll().Where(u => u.IsCompany).ToList();
-    var colors = new[] { "red", "orange", "yellow", "cyan", "green", "blue", "purple" };
+@code {
+    [Parameter]
+    public string Username { get; set; } = "";
+
+    // Prepare the same company list and color palette
+    private List<User> companies = new();
+    private string[] colors = { "red", "orange", "yellow", "cyan", "green", "blue", "purple" };
+
+    protected override void OnInitialized()
+    {
+        companies = Users.GetAll().Where(u => u.IsCompany).ToList();
+    }
 }
 
 <div class="container py-5">
+    <h3 class="mb-4">@Username’s Tickets</h3>
     <div class="row">
-        <!-- Sidebar -->
+        <!-- Sidebar of employees -->
         <div class="col-md-3">
             <h5>Employees</h5>
             <ul class="list-group mb-4">
@@ -22,16 +32,11 @@
                 {
                     var emp = companies[i];
                     var color = colors[i % colors.Length];
-                    var inProg = Tickets.GetAll().Count(t =>
-                    t.Handler == emp.Username &&
+                    var inProg = Tickets.GetAll()
+                    .Count(t => t.Handler == emp.Username &&
                     t.Status == TicketStatus.InProgress);
                     <li class="list-group-item d-flex justify-content-between align-items-center bg-secondary text-white">
-                        <span style="width:12px;height:12px;
-                         background:@color;
-                         border-radius:50%;
-                         display:inline-block;
-                         margin-right:0.5rem;">
-                        </span>
+                        <span style="width:12px;height:12px;background:@color;border-radius:50%;display:inline-block;margin-right:0.5rem;"></span>
                         <span class="flex-grow-1">@emp.Username</span>
                         <span class="badge bg-warning rounded-pill">@inProg</span>
                     </li>
@@ -39,20 +44,16 @@
             </ul>
         </div>
 
-        <!-- All Tickets -->
+        <!-- Filtered ticket list -->
         <div class="col-md-9">
-            <h3 class="mb-4">All Tickets</h3>
-
-            @foreach (var t in Tickets.GetAll().Where(t => t.Status != TicketStatus.Draft))
+            @foreach (var t in Tickets.GetAll().Where(t => t.Username == Username && t.Status != TicketStatus.Draft))
             {
-                // Find handler’s color
+                // find handler’s color
                 var handlerColor = "";
                 if (!string.IsNullOrEmpty(t.Handler))
                 {
                     var idx = companies.FindIndex(c => c.Username == t.Handler);
-                    handlerColor = idx >= 0
-                    ? colors[idx % colors.Length]
-                    : "transparent";
+                    handlerColor = idx >= 0 ? colors[idx % colors.Length] : "transparent";
                 }
 
                 <div class="card mb-2 p-3 d-flex justify-content-between align-items-start"
@@ -99,7 +100,8 @@
             }
 
             <div class="text-end mt-3">
-                <button class="btn btn-link" @onclick='() => Nav.NavigateTo("/users")'>
+                <button class="btn btn-link"
+                        @onclick='() => Nav.NavigateTo("/users")'>
                     ← Back to Users
                 </button>
             </div>

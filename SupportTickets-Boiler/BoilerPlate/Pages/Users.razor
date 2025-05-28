@@ -5,25 +5,34 @@
 @inject TicketService ticketService
 @inject NavigationManager Nav
 
+@{
+    var companies = userService.GetAll().Where(u => u.IsCompany).ToList();
+    var colors = new[] { "red", "orange", "yellow", "cyan", "green", "blue", "purple" };
+}
+
 <div class="container-fluid py-5 bg-dark text-light" style="min-height:80vh;">
     <div class="row">
-        <!-- Sidebar: company accounts -->
+        <!-- Sidebar of companies (unchanged) -->
         <aside class="col-md-3 mb-4">
             <h5>Companies</h5>
             <ul class="list-group">
-                @foreach (var comp in userService.GetAll().Where(u => u.IsCompany))
+                @for (int i = 0; i < companies.Count; i++)
                 {
-                    var cnt = ticketService.GetAll()
-                    .Count(t => t.Handler == comp.Username);
-                    <li class="list-group-item d-flex justify-content-between align-items-center bg-secondary text-white">
-                        @comp.Username
-                        <span class="badge bg-primary rounded-pill">@cnt</span>
+                    var comp = companies[i];
+                    var color = colors[i % colors.Length];
+                    var inProg = ticketService.GetAll()
+                    .Count(t => t.Handler == comp.Username &&
+                    t.Status == TicketStatus.InProgress);
+                    <li class="list-group-item d-flex align-items-center justify-content-between bg-secondary text-white">
+                        <span style="width:12px;height:12px;background:@color;border-radius:50%;display:inline-block;margin-right:0.5rem;"></span>
+                        <span class="flex-grow-1">@comp.Username</span>
+                        <span class="badge bg-warning rounded-pill">@inProg</span>
                     </li>
                 }
             </ul>
         </aside>
 
-        <!-- Main: users table + button -->
+        <!-- Main: users table with clickable usernames -->
         <section class="col-md-9">
             <h3 class="mb-4">Registered Users &amp; Ticket Counts</h3>
             <div class="table-responsive mb-3">
@@ -42,7 +51,12 @@
                         {
                             var list = ticketService.GetByUser(u.Username).ToList();
                             <tr>
-                                <td>@u.Username</td>
+                                <td>
+                                    <a class="text-light text-decoration-underline"
+                                       href="/company/user/@u.Username">
+                                        @u.Username
+                                    </a>
+                                </td>
                                 <td>@list.Count(t => t.Status == TicketStatus.Draft)</td>
                                 <td>@list.Count(t => t.Status == TicketStatus.Submitted)</td>
                                 <td>@list.Count(t => t.Status == TicketStatus.InProgress)</td>
