@@ -9,7 +9,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<TicketService>();
-builder.Services.AddSingleton<SessionService>();
+builder.Services.AddScoped<SessionService>();
 
 var app = builder.Build();
 

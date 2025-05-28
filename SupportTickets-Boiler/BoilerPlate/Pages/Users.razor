@@ -1,25 +1,21 @@
 ﻿@page "/users"
-@using BoilerPlate.Models
 @using BoilerPlate.Services
+@using BoilerPlate.Models
 @inject UserService   userService
 @inject TicketService ticketService
 @inject NavigationManager Nav
 
 <div class="container py-5">
-    <h3 class="text-center mb-4">Registered Users &amp; Ticket Counts</h3>
+    <h3 class="text-center mb-4">Registered Users &amp; Ticket Counts</h3>
 
     <table class="table table-striped">
         <thead>
         <tr>
-            <th>User</th>
-            <th>Drafts</th>
-            <th>Submitted</th>
-            <th>In Progress</th>
-            <th>Resolved</th>
+            <th>User</th><th>Drafts</th><th>Submitted</th><th>In Progress</th><th>Resolved</th>
         </tr>
         </thead>
         <tbody>
-        @foreach(var u in userService.GetAll())
+        @foreach(var u in userService.GetAll().Where(u => !u.IsCompany))
         {
             var list = ticketService.GetByUser(u.Username).ToList();
             <tr>

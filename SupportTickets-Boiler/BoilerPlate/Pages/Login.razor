@@ -1,34 +1,37 @@
 ﻿@page "/"
 @using BoilerPlate.Services
-@inject UserService Users
+@using BoilerPlate.Models
+@inject UserService    Users
 @inject SessionService Session
 @inject NavigationManager Nav
 
 <div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-4" style="min-width: 320px;">
+    <div class="card p-4" style="min-width: 320px; padding-bottom:4rem">
         <h3 class="text-center mb-3">Log In</h3>
 
         <input class="form-control form-control-lg mb-2"
                @bind="username"
+               @bind:event="oninput"
                placeholder="Username" />
 
         <input type="password"
-               class="form-control form-control-lg mb-3"
+               class="form-control form-control-lg mb-2"
                @bind="password"
+               @bind:event="oninput"
                placeholder="Password" />
 
-        <div class="form-check mb-3">
-            <input class="form-check-input"
-                   type="checkbox"
-                   id="companyCheck"
-                   @bind="isCompanyLogin" />
-            <label class="form-check-label" for="companyCheck">
-                Company Account
-            </label>
-        </div>
+        @* Live Account‐Type Confirmation *@
+        @if (ValidUser is not null)
+        {
+            <div class="text-center mb-3">
+                <small class="text-muted">
+                    Account type: <strong>@(ValidUser.IsCompany ? "Company" : "User")</strong>
+                </small>
+            </div>
+        }
 
         <button class="btn btn-primary btn-lg w-100 mb-2"
-                @onclick="DoLogin">
+                @onclick="HandleLogin">
             Log In
         </button>
 
@@ -44,19 +47,25 @@
 </div>
 
 @code {
-    string username, password, error;
-    bool isCompanyLogin;
+    string username = "", password = "", error = "";
 
-    void DoLogin()
+    // Computed property—re‑evaluates on each render
+    User? ValidUser => Users.Authenticate(username, password);
+
+    void HandleLogin()
     {
-        var u = Users.Authenticate(username, password);
-        if (u == null) { error = "Bad credentials"; return; }
-        if (u.IsCompany != isCompanyLogin) { error = "Account type mismatch"; return; }
+        var u = ValidUser;
+        if (u == null)
+        {
+            error = "Bad credentials";
+            return;
+        }
 
-        Session.CurrentUsername = username;
-        if (u.IsCompany)
-            Nav.NavigateTo("/users");          // company starts at Users page
-        else
-            Nav.NavigateTo("/submit");         // regular users go to Submit
+        // store session
+        Session.CurrentUsername = u.Username;
+        Session.IsCompany       = u.IsCompany;
+
+        // navigate
+        Nav.NavigateTo(u.IsCompany ? "/users" : "/submit");
     }
 }

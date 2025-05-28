@@ -8,26 +8,41 @@
         <h3 class="text-center mb-3">Sign Up</h3>
 
         <input class="form-control form-control-lg mb-2"
-               @bind="username"
-               placeholder="Username" />
+               @bind="username" placeholder="Username" />
 
         <input type="password"
-               class="form-control form-control-lg mb-3"
-               @bind="password"
-               placeholder="Password" />
+                      class="form-control form-control-lg mb-2"
+                      @bind="password" 
+                      @bind:event="oninput"
+                      placeholder="Password" />
 
         <div class="form-check mb-3">
-            <input class="form-check-input"
-                   type="checkbox"
-                   id="companyCheck"
-                   @bind="isCompany" />
-            <label class="form-check-label" for="companyCheck">
-                Company Account
-            </label>
+            <input class="form-check-input" type="checkbox" id="companyCheck" @bind="isCompany" />
+            <label class="form-check-label" for="companyCheck">Company Account</label>
         </div>
 
-        <button class="btn btn-success btn-lg w-100 mb-2"
-                @onclick="DoSignup">
+        <!-- Password Requirements -->
+        <ul class="list-unstyled mb-1">
+            <li class="@(hasUpper ? "text-success" : "text-danger")">
+                @(hasUpper ? "✔" : "✖") At least one uppercase letter
+            </li>
+            <li class="@(hasNumber ? "text-success" : "text-danger")">
+                @(hasNumber ? "✔" : "✖") At least one number
+            </li>
+            <li class="@(hasSpecial ? "text-success" : "text-danger")">
+                @(hasSpecial ? "✔" : "✖") At least one special character
+            </li>
+            <li class="@(password.Length >= 8 ? "text-success" : "text-danger")">
+                @(password.Length >= 8 ? "✔" : "✖") 8+ characters
+            </li>
+        </ul>
+        <!-- Strength bar: 4 chars → 0%, 12 chars → 100% -->
+        <div class="progress mb-3" style="height:0.75rem;">
+            <div class="progress-bar" role="progressbar"
+                 style="width:@strength%"></div>
+        </div>
+
+        <button class="btn btn-success btn-lg w-100 mb-2" @onclick="DoSignup">
             Sign Up
         </button>
 
@@ -43,12 +58,30 @@
 </div>
 
 @code {
-    string username, password, error;
+    string username = "", password = "", error = "";
+
     bool isCompany;
+
+    bool hasUpper   => !string.IsNullOrEmpty(password) && password.Any(char.IsUpper);
+    bool hasNumber  => !string.IsNullOrEmpty(password) && password.Any(char.IsDigit);
+    bool hasSpecial => !string.IsNullOrEmpty(password) && password.Any(ch => !char.IsLetterOrDigit(ch));
+    int  strength   => string.IsNullOrEmpty(password)
+        ? 0
+        : Math.Clamp((password.Length - 4) * 100 / 8, 0, 100);
 
     void DoSignup()
     {
-        if (Users.Register(new() { Username=username, Password=password, IsCompany=isCompany }))
+        if (!hasUpper || !hasNumber || !hasSpecial || password.Length < 8)
+        {
+            error = "Password does not meet all requirements.";
+            return;
+        }
+        if (Users.Register(new()
+            {
+                Username = username,
+                Password = password,
+                IsCompany = isCompany
+            }))
             Nav.NavigateTo("/");
         else
             error = "Username already taken";
