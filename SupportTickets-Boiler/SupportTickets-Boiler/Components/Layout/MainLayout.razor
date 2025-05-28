@@ -3,6 +3,40 @@
 @inherits LayoutComponentBase
 @inject CookieThemeService CookieThemeService
 
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <!-- Raja Logo Button (TOP LEFT - stays as is) -->
+            <a href="/" class="raja-logo-button">Raja</a>
+
+            <!-- New Buttons (TOP RIGHT) -->
+            <a href="/features" class="top-nav-button">Features</a>
+            <a href="/pricing" class="top-nav-button">Pricing</a>
+            <a href="/checkout" class="top-nav-button buy-now-button">BUY NOW!</a>
+
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+
+@code {
+    // No changes needed here
+}
+
+@code {
+    // No changes needed here for these specific requests
+}
+@*
+
 <div class="page">
     <div class="sidebar">
         <RadzenButton Click="@ButtonClicked" Text="Hi"></RadzenButton>
@@ -31,3 +65,4 @@
 </div>
 
 
+*@
